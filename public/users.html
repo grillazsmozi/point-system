@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="hu">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Irányítópult</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#007AFF",
+              secondary: "#86868B",
+            },
+            borderRadius: {
+              none: "0px",
+              sm: "4px",
+              DEFAULT: "8px",
+              md: "12px",
+              lg: "16px",
+              xl: "20px",
+              "2xl": "24px",
+              "3xl": "32px",
+              full: "9999px",
+              button: "8px",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      :where([class^="ri-"])::before { content: "\f3c2"; }
+      .sidebar-item:hover { background-color: rgba(0,0,0,0.05); }
+      .sidebar-item.active { background-color: rgba(0,0,0,0.1); }
+      #toggleSidebar {
+      transition: left 0.3s ease;
+      }
+      #sidebar {
+      transform: translateX(0);
+      transition: transform 0.3s ease;
+      }
+    </style>
+  </head>
+  <body class="bg-[#F5F5F7]">
+    <div class="flex min-h-screen">
+      <aside
+        class="w-64 bg-white shadow-lg fixed h-full transition-all duration-300"
+        id="sidebar"
+      >
+        <div class="p-6">
+          <h1 class="font-['Pacifico'] text-2xl text-primary mb-8">Üdvözletem!</h1>
+          <nav class="space-y-2">
+            <a
+              href="/dashboard"
+              class="sidebar-item flex items-center px-4 py-3 rounded-lg text-gray-700"
+            >
+              <i
+                class="ri-dashboard-line w-5 h-5 flex items-center justify-center mr-3"
+              ></i>
+              Állomások
+            </a>
+            <a
+              href="#"
+              class="sidebar-item active flex items-center px-4 py-3 rounded-lg text-gray-700"
+            >
+              <i
+                class="ri-user-line w-5 h-5 flex items-center justify-center mr-3"
+              ></i>
+              Felhasználók
+            </a>
+            <div class="relative" id="adminDropdown">
+              <button
+                class="sidebar-item flex items-center px-4 py-3 rounded-lg text-gray-700 w-full"
+                onclick="toggleDropdown()"
+              >
+                <i
+                  class="ri-settings-line w-5 h-5 flex items-center justify-center mr-3"
+                ></i>
+                Adminisztrátor
+                <i
+                  class="ri-arrow-down-s-line w-5 h-5 flex items-center justify-center ml-auto"
+                ></i>
+              </button>
+              <div
+                class="hidden absolute left-0 w-full bg-white shadow-lg rounded-lg mt-2 py-2"
+                id="dropdownMenu"
+              >
+              <a
+              href="/admin/"
+              class="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+              >Állomások kezelése</a
+            >
+            <a
+              href="/admin/users"
+              class="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+              >Felhasználók kezelése</a
+            >
+            <a
+              href="/admin/analytics"
+              class="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+              >Analitika</a
+            >
+
+            <a
+              href="/admin/settings"
+              class="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+              >Portál beállítások</a
+            >
+              </div>
+            </div>
+          </nav>
+        </div>
+        <div class="absolute bottom-0 w-full p-6">
+          <button
+            class="sidebar-item flex items-center px-4 py-3 rounded-lg text-red-600 w-full" onclick="logout()"
+          >
+            <i
+              class="ri-logout-box-line w-5 h-5 flex items-center justify-center mr-3"
+            ></i>
+            Kijelentkezés
+          </button>
+        </div>
+      </aside>
+      <button
+        id="toggleSidebar"
+        class="fixed top-4 left-[17rem] z-50 bg-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg"
+      >
+        <i class="ri-menu-line w-6 h-6 flex items-center justify-center"></i>
+      </button>
+      <main
+        class="flex-1 ml-64 p-8 transition-all duration-300"
+        id="mainContent"
+      >
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-semibold">Felhasználók</h2>
+            <div class="flex gap-4">
+              <div class="relative">
+                <input
+                  type="text"
+                  id="searchInput"
+                  placeholder="Keresés..."
+                  class="pl-10 pr-4 py-2 border rounded-lg text-sm"
+                />
+                <i
+                  class="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 flex items-center justify-center"
+                ></i>
+              </div>
+              <button
+                onclick="openModal()"
+                class="bg-primary text-white px-4 py-2 rounded-button hover:bg-primary/90 transition-colors flex items-center gap-2"
+              >
+                <i
+                  class="ri-add-line w-4 h-4 flex items-center justify-center"
+                ></i>
+                Új felhasználó
+              </button>
+              <div
+                id="userModal"
+                class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center"
+              >
+                <div class="bg-white rounded-lg p-6 w-[480px]">
+                  <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-semibold">
+                      Új felhasználó hozzáadása
+                    </h3>
+                    <button
+                      onclick="closeModal()"
+                      class="text-gray-500 hover:text-gray-700"
+                    >
+                      <i
+                        class="ri-close-line w-6 h-6 flex items-center justify-center"
+                      ></i>
+                    </button>
+                  </div>
+                  <form id="newUserForm" class="space-y-4">
+                    <div>
+                      <label
+                        class="block text-sm font-medium text-gray-700 mb-1"
+                        >Név</label
+                      >
+                      <input
+                        type="text"
+                        id="userName"
+                        name="newname"
+                        required
+                        class="w-full px-3 py-2 border rounded-lg text-sm"
+                        placeholder="Add meg a nevet"
+                      />
+                    </div>
+                    <div>
+                      <label
+                        class="block text-sm font-medium text-gray-700 mb-1"
+                        >Szám</label
+                      >
+                      <input
+                        type="text"
+                        id="userNumber"
+                        name="newnumber"
+                        required
+                        class="w-full px-3 py-2 border rounded-lg text-sm"
+                        placeholder="Add meg a számot"
+                      />
+                    </div>
+                    <div>
+                      <label
+                        class="block text-sm font-medium text-gray-700 mb-1"
+                        >Osztály</label
+                      >
+                      <select
+                        id="userClass"
+                        name="newclass"
+                        required
+                        class="w-full px-3 py-2 border rounded-lg text-sm pr-8"
+                      >
+                      <option value="">- Válassz -</option>  
+                      <option value="5A">5A</option>
+                        <option value="5B">5B</option>
+                        <option value="5C">5C</option>
+                        <option value="6A">6A</option>
+                        <option value="6B">6B</option>
+                        <option value="7">7</option>
+                        <option value="8A">8A</option>
+                        <option value="8B">8B</option>
+                      </select>
+                    </div>
+                    <div class="flex justify-end gap-3 mt-6">
+                      <button
+                        type="button"
+                        onclick="closeModal()"
+                        class="px-4 py-2 text-gray-700 border rounded-button hover:bg-gray-50"
+                      >
+                        Mégse
+                      </button>
+                      <button
+                        type="submit"
+                        class="bg-primary text-white px-4 py-2 rounded-button hover:bg-primary/90"
+                      >
+                        Mentés
+                      </button>
+                    </div>
+                    <input type="hidden" value="0" name="newpoints">
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="border-b">
+                  <th class="text-left py-4 px-4 font-medium text-gray-600">
+                    Név
+                  </th>
+                  <th class="text-left py-4 px-4 font-medium text-gray-600">
+                    Szám
+                  </th>
+                  <th class="text-left py-4 px-4 font-medium text-gray-600">
+                    Osztály
+                  </th>
+                  <th class="text-left py-4 px-4 font-medium text-gray-600">
+                    Utolsó állomás
+                  </th>
+                  <th class="text-right py-4 px-4 font-medium text-gray-600">
+                    ∑
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="userTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+      <!--script>
+        let jsonStringg;
+
+        async function initUsers() {
+            try {
+                    const response = await fetch(`/api/users/list`, {
+                        method: 'GET',
+                    });
+
+                    jsonStringg = await response.json();
+
+                    console.log(jsonStringg)
+                } catch (error) {
+                    console.log("Fetching error 1: " + error)
+                }
+
+        }
+
+        function parseJsonToArray(jsonString) {
+            const data = JSON.parse(jsonString); // Parse the JSON string
+            if (!Array.isArray(data) || data.length === 0) return [];
+
+            return data.map(item => ({
+                name: item.data.name,
+                number: item.data.number,
+                class: item.data.class,
+                lastStation: "dont need to do anything with this", // Placeholder
+                sum: "points" // Assuming points is a placeholder (you can replace it if needed)
+            }));
+        }
+
+
+        const mockUsers = [
+          {
+            name: "Kovács István",
+            number: "36201234567",
+            class: "A",
+            lastStation: "Budapest",
+            sum: "125000 Ft",
+          },
+          {
+            name: "Nagy Emma",
+            number: "36302345678",
+            class: "B",
+            lastStation: "Debrecen",
+            sum: "98000 Ft",
+          },
+          {
+            name: "Szabó Péter",
+            number: "36703456789",
+            class: "A",
+            lastStation: "Szeged",
+            sum: "156000 Ft",
+          },
+          {
+            name: "Tóth Anna",
+            number: "36204567890",
+            class: "C",
+            lastStation: "Pécs",
+            sum: "87000 Ft",
+          },
+          {
+            name: "Horváth Márk",
+            number: "36305678901",
+            class: "B",
+            lastStation: "Győr",
+            sum: "143000 Ft",
+          },
+          {
+            name: "Kiss Júlia",
+            number: "36706789012",
+            class: "A",
+            lastStation: "Miskolc",
+            sum: "112000 Ft",
+          },
+          {
+            name: "Varga Dániel",
+            number: "36207890123",
+            class: "C",
+            lastStation: "Székesfehérvár",
+            sum: "94000 Ft",
+          },
+          {
+            name: "Molnár Zsófia",
+            number: "36308901234",
+            class: "B",
+            lastStation: "Kecskemét",
+            sum: "167000 Ft",
+          },
+        ];
+        initUsers()
+
+        let mUsers = parseJsonToArray(jsonStringg)
+
+        function renderUsers(users = mUsers) {
+          const tbody = document.getElementById("userTableBody");
+          tbody.innerHTML = users
+            .map(
+              (user) => `
+        <tr class="border-b hover:bg-gray-50">
+        <td class="py-4 px-4">${user.name}</td>
+        <td class="py-4 px-4">${user.number}</td>
+        <td class="py-4 px-4">${user.class}</td>
+        <td class="py-4 px-4">${user.lastStation}</td>
+        <td class="py-4 px-4 text-right font-medium">${user.sum}</td>
+        </tr>
+        `,
+            )
+            .join("");
+        }
+        function searchUsers(searchTerm) {
+          const filteredUsers = mockUsers.filter((user) =>
+            Object.values(user).some((value) =>
+              value.toString().toLowerCase().includes(searchTerm.toLowerCase()),
+            ),
+          );
+          renderUsers(filteredUsers);
+        }
+        document.getElementById("searchInput").addEventListener("input", (e) => {
+          searchUsers(e.target.value);
+        });
+        renderUsers();
+      </script-->
+    <script>
+      let jsonStringg = []; // Stores fetched user data
+let mUsers = []; // Stores processed user data
+
+async function initUsers() {
+    try {
+        const response = await fetch(`/api/users/list`, {
+            method: 'GET',
+        });
+
+        jsonStringg = await response.json(); // Fetch JSON response
+        console.log("Fetched Data:", jsonStringg); // Debugging
+
+        // Extract user list from JSON (if nested inside "users")
+        let dataArray = Array.isArray(jsonStringg) ? jsonStringg : jsonStringg.users || [];
+
+        mUsers = parseJsonToArray(dataArray);
+        console.log(dataArray);
+        renderUsers(mUsers); // Render the fetched users
+    } catch (error) {
+        console.error("Fetching error: " + error);
+    }
+}
+
+function parseJsonToArray(data) {
+    if (!Array.isArray(data) || data.length === 0) return [];
+
+    return data.map(item => ({
+        name: item.name || item.data?.name || "Unknown",
+        number: item.number || item.data?.number || "Unknown",
+        class: item.class || item.data?.class || "Unknown",
+        lastStation: "-", // Placeholder
+        sum: item.points || item.data?.points || "N/A",
+        _entryId: item._entryId || item.data?._entryId || "#" // Ensure a valid ID is present
+    }));
+}
+
+function renderUsers(users) {
+    const tbody = document.getElementById("userTableBody");
+    tbody.innerHTML = users //<td class="py-4 px-4"><a href="/users/${user._entryId}">${user.name}</a></td>
+        .map(user => `
+            <tr class="border-b hover:bg-gray-50">
+                <td class="py-4 px-4">${user.name}</td>
+                <td class="py-4 px-4">${user.number}</td>
+                <td class="py-4 px-4">${user.class}</td>
+                <td class="py-4 px-4">${user.lastStation}</td>
+                <td class="py-4 px-4 text-right font-medium">${user.sum}</td>
+            </tr>
+        `)
+        .join("");
+}
+
+function searchUsers(searchTerm) {
+    const filteredUsers = mUsers.filter(user =>
+        Object.values(user).some(value =>
+            value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+        )
+    );
+    renderUsers(filteredUsers);
+}
+
+// Event listener for search
+document.getElementById("searchInput").addEventListener("input", (e) => {
+    searchUsers(e.target.value);
+});
+
+// Initialize users
+initUsers();
+
+    </script>
+    
+    <script>
+      function toggleDropdown() {
+        const dropdownMenu = document.getElementById("dropdownMenu");
+        dropdownMenu.classList.toggle("hidden");
+      }
+      function openModal() {
+        document.getElementById("userModal").classList.remove("hidden");
+        document.getElementById("userModal").classList.add("flex");
+      }
+      function closeModal() {
+        document.getElementById("userModal").classList.add("hidden");
+        document.getElementById("userModal").classList.remove("flex");
+      }
+      document.getElementById("newUserForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(document.getElementById("newUserForm"));
+
+        const response = await fetch('/api/users/register', {
+            method: "POST",
+            body: new URLSearchParams(formData),
+        })
+
+        closeModal();
+        window.location.reload()
+
+        document.getElementById("newUserForm").reset();
+      });
+      document.addEventListener("click", function (event) {
+        const dropdown = document.getElementById("adminDropdown");
+        const dropdownMenu = document.getElementById("dropdownMenu");
+        if (!dropdown.contains(event.target)) {
+          dropdownMenu.classList.add("hidden");
+        }
+      });
+      const sidebar = document.getElementById("sidebar");
+      const mainContent = document.getElementById("mainContent");
+      const toggleBtn = document.getElementById("toggleSidebar");
+      let sidebarOpen = true;
+      function toggleSidebar() {
+        sidebarOpen = !sidebarOpen;
+        if (sidebarOpen) {
+          sidebar.style.transform = "translateX(0)";
+          mainContent.style.marginLeft = "16rem";
+          toggleBtn.style.left = "17rem";
+        } else {
+          sidebar.style.transform = "translateX(-100%)";
+          mainContent.style.marginLeft = "0";
+          toggleBtn.style.left = "1rem";
+        }
+      }
+      toggleBtn.addEventListener("click", toggleSidebar);
+    </script>
+    <script>
+      function logout() {
+        window.sessionStorage.removeItem("logged")
+        window.sessionStorage.removeItem("admin-logged")
+        window.location.href = "/"
+      }
+    </script>
+    <script src="/js/auth.js"></script>
+  </body>
+</html>

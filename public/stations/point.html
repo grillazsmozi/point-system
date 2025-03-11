@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Enter Code</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <style>
+      :where([class^="ri-"])::before { content: "\f3c2"; }
+      @font-face {
+      font-family: 'SF Pro Display';
+      src: local('SF Pro Display');
+      }
+      .code-input {
+      transition: all 0.3s ease;
+      }
+      .code-circle {
+      transition: all 0.2s ease;
+      }
+      .code-circle.filled {
+      background-color: #1D1D1F;
+      border-color: #1D1D1F;
+      }
+      .numpad-btn {
+      transition: all 0.15s ease;
+      -webkit-tap-highlight-color: transparent;
+      opacity: 0;
+      transform: translateY(20px);
+      }
+      .numpad-btn.show {
+      opacity: 1;
+      transform: translateY(0);
+      }
+      .numpad-btn:active {
+      transform: scale(0.97);
+      }
+      @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+      }
+      .shake {
+      animation: shake 0.4s ease-in-out;
+      }
+      @keyframes fadeInDown {
+      from {
+      opacity: 0;
+      transform: translateY(-20px);
+      }
+      to {
+      opacity: 1;
+      transform: translateY(0);
+      }
+      }
+      .fade-in-down {
+      animation: fadeInDown 0.3s ease-out forwards;
+      }
+      .code-circle {
+      opacity: 0;
+      transform: scale(0.8);
+      }
+      .code-circle.animate {
+      animation: scaleIn 0.4s ease-out forwards;
+      }
+      @keyframes scaleIn {
+      from {
+      opacity: 0;
+      transform: scale(0.9);
+      }
+      to {
+      opacity: 1;
+      transform: scale(1);
+      }
+      }
+    </style>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#007AFF",
+              secondary: "#F5F5F7",
+            },
+            borderRadius: {
+              none: "0px",
+              sm: "4px",
+              DEFAULT: "8px",
+              md: "12px",
+              lg: "16px",
+              xl: "20px",
+              "2xl": "24px",
+              "3xl": "32px",
+              full: "9999px",
+              button: "8px",
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="min-h-screen bg-white">
+    <div class="max-w-md mx-auto px-6 py-12">
+      <header class="text-center mb-16 opacity-0">
+        <h1
+          class="text-2xl font-semibold text-[#1D1D1F] mb-2"
+          style="font-family: 'SF Pro Display', -apple-system, sans-serif"
+          id="stationName"
+        >
+          Állomás név
+        </h1>
+        <p
+          class="text-[#86868B]"
+          style="font-family: 'SF Pro Display', -apple-system, sans-serif" id="desc"
+        >
+          Adja meg a játékos azonosítóját.
+        </p>
+      </header>
+      <div
+        class="code-display flex justify-center space-x-4 mb-16"
+        id="codeDisplay"
+      >
+
+      <h3
+          class="text-2xl font-semibold text-[#1D1D1F] mb-2"
+          style="font-family: 'SF Pro Display', -apple-system, sans-serif; padding: none;"
+          id="code"
+        >
+          
+        </h3>
+    </div>
+      <div class="numpad grid grid-cols-3 gap-3">
+        <button
+          class="numpad-btn h-[75px] rounded-full bg-[#F5F5F7] flex items-center justify-center text-[27px] font-light text-[#1D1D1F] cursor-pointer hover:bg-[#E5E5E5] active:bg-[#D1D1D6]"
+          style="font-family: 'SF Pro Display', -apple-system, sans-serif"
+        >
+          1
+        </button>
+        <button
+          class="numpad-btn h-[75px] rounded-full bg-[#F5F5F7] flex items-center justify-center text-[27px] font-light text-[#1D1D1F] cursor-pointer hover:bg-[#E5E5E5] active:bg-[#D1D1D6]"
+          style="font-family: 'SF Pro Display', -apple-system, sans-serif"
+        >
+          2
+        </button>
+        <button
+          class="numpad-btn h-[75px] rounded-full bg-[#F5F5F7] flex items-center justify-center text-[27px] font-light text-[#1D1D1F] cursor-pointer hover:bg-[#E5E5E5] active:bg-[#D1D1D6]"
+          style="font-family: 'SF Pro Display', -apple-system, sans-serif"
+        >
+          3
+        </button>
+        <button
+          class="numpad-btn h-[75px] rounded-full bg-[#F5F5F7] flex items-center justify-center text-[27px] font-light text-[#1D1D1F] cursor-pointer hover:bg-[#E5E5E5] active:bg-[#D1D1D6]"
+          style="font-family: 'SF Pro Display', -apple-system, sans-serif"
+        >
+          4
+        </button>
+        <button
+          class="numpad-btn h-[75px] rounded-full bg-[#F5F5F7] flex items-center justify-center text-[27px] font-light text-[#1D1D1F] cursor-pointer hover:bg-[#E5E5E5] active:bg-[#D1D1D6]"
+          style="font-family: 'SF Pro Display', -apple-system, sans-serif"
+        >
+          5
+        </button>
+        <button
+          class="numpad-btn h-[75px] rounded-full bg-[#F5F5F7] flex items-center justify-center text-[27px] font-light text-[#1D1D1F] cursor-pointer hover:bg-[#E5E5E5] active:bg-[#D1D1D6]"
+          style="font-family: 'SF Pro Display', -apple-system, sans-serif"
+        >
+          6
+        </button>
+        <button
+          class="numpad-btn h-[75px] rounded-full bg-[#F5F5F7] flex items-center justify-center text-[27px] font-light text-[#1D1D1F] cursor-pointer hover:bg-[#E5E5E5] active:bg-[#D1D1D6]"
+          style="font-family: 'SF Pro Display', -apple-system, sans-serif"
+        >
+          7
+        </button>
+        <button
+          class="numpad-btn h-[75px] rounded-full bg-[#F5F5F7] flex items-center justify-center text-[27px] font-light text-[#1D1D1F] cursor-pointer hover:bg-[#E5E5E5] active:bg-[#D1D1D6]"
+          style="font-family: 'SF Pro Display', -apple-system, sans-serif"
+        >
+          8
+        </button>
+        <button
+          class="numpad-btn h-[75px] rounded-full bg-[#F5F5F7] flex items-center justify-center text-[27px] font-light text-[#1D1D1F] cursor-pointer hover:bg-[#E5E5E5] active:bg-[#D1D1D6]"
+          style="font-family: 'SF Pro Display', -apple-system, sans-serif"
+        >
+          9
+        </button>
+        <button
+          class="numpad-btn h-[75px] rounded-full bg-[#F5F5F7] flex items-center justify-center text-[16px] font-normal text-[#1D1D1F] cursor-pointer hover:bg-[#E5E5E5] active:bg-[#D1D1D6]"
+          style="font-family: 'SF Pro Display', -apple-system, sans-serif"
+        >
+          Vissza
+        </button>
+        <button
+          class="numpad-btn h-[75px] rounded-full bg-[#F5F5F7] flex items-center justify-center text-[27px] font-light text-[#1D1D1F] cursor-pointer hover:bg-[#E5E5E5] active:bg-[#D1D1D6]"
+          style="font-family: 'SF Pro Display', -apple-system, sans-serif"
+        >
+          0
+        </button>
+        <button
+          class="numpad-btn h-[75px] rounded-full bg-[#F5F5F7] flex items-center justify-center text-[27px] text-[#1D1D1F] cursor-pointer hover:bg-[#E5E5E5] active:bg-[#D1D1D6]"
+          id="backspace"
+        >
+          <i class="ri-delete-back-2-line text-2xl"></i>
+        </button>
+        <button
+          class="numpad-btn h-[75px] rounded-full bg-[#F5F5F7] flex items-center justify-center text-[27px] text-[#1D1D1F] cursor-pointer hover:bg-[#E5E5E5] active:bg-[#D1D1D6]"
+          id="done"
+        >
+          <i class="ri-check-line text-2xl"></i>
+        </button>
+      </div>
+    </div>
+
+    <form id="newUserForm">
+      <input type="hidden" id="userid" name="userid">
+      <input type="hidden" id="stationid" name="stationid">
+      <input type="hidden" id="point" name="point">
+    </form>
+
+    <script>
+      let code = "";
+
+      const numpadBtns = document.querySelectorAll(".numpad-btn");
+      const validCode = "123456";
+      let page = 0
+
+      document.addEventListener("DOMContentLoaded", () => {
+        // Animate header
+        document.querySelector("header").classList.add("fade-in-down");
+        // Animate numpad buttons
+        numpadBtns.forEach((btn, index) => {
+          setTimeout(
+            () => {
+              btn.classList.add("show");
+            },
+            300 + index * 30,
+          );
+        });
+      });
+      numpadBtns.forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const value = btn.textContent.trim();
+          if (value === "Vissza") {
+            window.location.href = "/dashboard"
+          } else if (btn.id === "backspace") {
+            code = code.slice(0, -1);
+            updateDisplay();
+          }else if (btn.id === "done") {
+            
+            if (!page == 1) {
+              const request = await fetch(`/api/users/get-id/${code}`, {
+    method: "GET",
+});
+
+const reply = await request.json(); // ✅ Await the JSON response
+
+console.log(reply); // Debugging
+
+if (Array.isArray(reply) && reply.length > 0) {
+    // Assuming _entryId is inside the first object in the array
+    document.getElementById("userid").value = reply[0]._entryId || "N/A"; 
+} else {
+    console.error("Invalid or empty response:", reply);
+}
+
+code = "";
+updateDisplay();
+document.getElementById("desc").innerText = `Adja meg a szerzett pontot. (Maximum: ${data[0].data.points})`;
+page += 1;
+
+
+            } else {
+              const codeInt = parseInt(code);
+              const pointsInt = parseInt(data[0].data.points);
+
+              if (codeInt <= pointsInt) {
+                document.getElementById("point").value = codeInt
+                console.log("Subform");
+                subform();
+              } else {
+                document.getElementById("desc").innerText = `A maximumnál több pont nem adható! (Max: ${data[0].data.points})`;
+              }
+            }
+          } else if ( code.length < 6) {
+            code += value;
+            updateDisplay();
+            if (code.length === 6) {
+              // do nothing
+            }
+          }
+        });
+      });
+      function updateDisplay() {
+        document.getElementById("code").innerText = code
+        //console.log(code)
+      }
+      let data;
+      async function fetchStationData() {
+        const url = new URL(window.location.href);
+        const stationId = url.searchParams.get("id");
+
+
+        if (!stationId) {
+          window.location.href = "/"
+        }
+
+        try {
+          const response = await fetch(`/api/stations/get/${stationId}`, {
+            method: "GET",
+          });
+
+          data = await response.json(); // Parse the JSON response
+          console.log(data);
+        } catch (error) {
+          console.error("Error:", error); // Handle errors
+        }
+
+        document.getElementById("stationName").innerText = `Állomás: ${data[0].data.name} (Azonosító: ${data[0].data.number})`
+        document.getElementById("stationid").value = data[0].data._id
+      }
+
+      async function subform(){
+
+        const formData = new FormData(document.getElementById("newUserForm"));
+
+        const response = await fetch('/api/points/register', {
+            method: "POST",
+            body: new URLSearchParams(formData),
+        })
+
+        window.location.reload()
+
+        document.getElementById("newUserForm").reset();
+      };
+
+    fetchStationData();
+    </script>
+    <script src="/js/auth.js"></script>
+  </body>
+</html>
