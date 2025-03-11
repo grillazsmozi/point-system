@@ -186,7 +186,7 @@
               <select
                 class="bg-gray-50 border-none rounded-lg text-sm px-3 py-2" id="leaderboard-select"
               >
-                <option>Összes</option>
+                <option value="all">Összes</option>
               </select>
             </div>
             <div id="leaderboard-container" class="h-80">
@@ -402,6 +402,107 @@ function renderUsers(users) {
         `)
         .join("");
 }
+
+document.getElementById("leaderboard-select").addEventListener("change", async function() {
+    const selectedStationId = this.value;
+    console.log(`Selected Station ID: ${selectedStationId}`);
+
+    // If the selected value is "all", no need to filter, just render all users
+    if (selectedStationId === "all") {
+        renderUsers(mUsers); // Render all users without any filtering
+        return;
+    }
+
+    try {
+        // Fetch logs and stations data
+        const logsr = await fetch("/api/logs/list");
+        const logs = await logsr.json(); // Get the logs data
+
+        const stationsr = await fetch("/api/stations/list");
+        const stations = await stationsr.json(); // Get the stations data
+
+        // Debugging logs and stations
+        console.log("Fetched Logs:", logs);
+        console.log("Fetched Stations:", stations);
+
+        let data = [];
+
+        // Check if logs is an array and filter based on selected station
+        if (Array.isArray(logs)) {
+            logs.forEach(log => {
+                console.log(`Checking log:`, log); // Debugging each log
+
+                // Access stationid and userid from the 'data' field
+                const stationId = log.data?.stationid;
+                const userId = log.data?.userid;
+                let points = log.data?.points;  // Change const to let so we can modify points
+
+                // Debugging the accessed values
+                console.log(`stationid: ${stationId}, userid: ${userId}, points: ${points}`);
+
+                // Check if log.stationid matches the selected station
+                if (stationId === selectedStationId) {
+                    // Log the matching log for debugging
+                    console.log(`Log matches selected station:`, log);
+
+                    // Ensure that 'userid' exists in the log entry and push it to 'data'
+                    if (userId) {
+                        // Handle points: Strip "+" and convert to a number
+                        if (points && points.startsWith('+')) {
+                            points = points.substring(1); // Remove the "+" sign
+                        }
+                        const numericPoints = parseFloat(points); // Convert to a number
+
+                        // Log the cleaned-up points
+                        console.log(`Processed points: ${numericPoints}`);
+
+                        // Add to the data array with userId and points
+                        data.push({ userId, points: numericPoints });
+                    } else {
+                        console.log(`No userid found in log:`, log);
+                    }
+                } else {
+                    console.log(`Log does not match selected stationid: ${stationId}`);
+                }
+            });
+        } else {
+            console.log("Logs are not an array:", logs);
+        }
+
+        // Log the collected data (userIds and their points)
+        console.log("Collected User IDs and Points:", data);
+
+        // Now sort the 'data' array by points in descending order
+        data.sort((a, b) => b.points - a.points);
+
+        // Log the sorted data
+        console.log("Sorted User IDs and Points (Descending):", data);
+
+        // Use the sorted userIds to filter mUsers and render them
+        const filteredUsers = mUsers.filter(user => {
+            return data.some(item => item.userId === user._entryId); // Match by userId
+        });
+
+        console.log("Filtered Users:", filteredUsers); // Debugging the filtered users
+
+        // Sort the filtered users by points, using the sorted data
+        filteredUsers.sort((a, b) => {
+            // Find the points for each user from the sorted 'data'
+            const aPoints = data.find(item => item.userId === a._entryId)?.points || 0;
+            const bPoints = data.find(item => item.userId === b._entryId)?.points || 0;
+            return bPoints - aPoints; // Sort by points in descending order
+        });
+
+        console.log("Sorted Users:", filteredUsers); // Debugging the final sorted users
+
+        // Render the filtered and sorted users
+        renderUsers(filteredUsers);
+
+    } catch (error) {
+        console.error("Error fetching logs or stations:", error);
+    }
+});
+
 
 
 function searchUsers(searchTerm) {

@@ -316,6 +316,6 @@ app.get("/api/logs/delete/all", (req, res) => {
 //})
 
 
-app.listen(process.env.PORT || 3000, () => {
+app.listen(process.env.PORT || 3000, "192.168.1.156", () => {
     console.log(`Server is running on port ${process.env.PORT || 3000}`)
 })
