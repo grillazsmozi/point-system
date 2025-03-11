@@ -279,7 +279,9 @@ app.delete("/api/users/delete/:id", async(req, res) => {
     }
 })
 
-
+app.get("/loaderio-ea430d8686d5edd4219c4a442d1e3dca.txt", (req, res) => {
+    res.sendFile(__dirname + "/loaderio-ea430d8686d5edd4219c4a442d1e3dca.txt")
+})
 
 
 
