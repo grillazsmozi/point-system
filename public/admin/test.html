@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        async function bestStation() {
+            const logsr = await fetch("/api/logs/list")
+            const logs = await logsr.json()  // await the promise to get the actual data
+
+            const stationsr = await fetch("/api/stations/list")
+            const stations = await stationsr.json()  // await the promise to get the actual data
+
+            
+            console.log(logs);
+            console.log(stations);
+
+            let data = [];
+
+            // Check if logs is an array before using forEach
+            if (Array.isArray(logs)) {
+                logs.forEach(log => {
+                    if (log.goodLog === true) {  // Use '===' for comparison
+                        try {
+                            for (let i = 0; i < data.length; i++) {
+                                let found = false
+                                const element = data[i];
+                                
+                                if (element.stationid === log.stationid) {
+                                    found = true
+                                    const str = log.point
+                                    const point = parseInt(str.replace("+",""))
+
+                                    element.players += 1
+                                    element.sum += point
+                                } else {
+                                    data.push({
+                                        stationid: log.stationid,
+                                        players: 1,
+                                        sum: parseInt(log.point.replace("+",""))
+                                    })
+                                }
+                                console.log("Data:" + data)
+                        }
+                        } catch (error) {
+                            console.log(error)
+                        }
+                    }
+                });
+            } else {
+                console.log("Logs are not an array:", logs);
+            }
+        }
+
+bestStation()
+
+
+    </script>
+</body>
+</html>

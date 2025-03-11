@@ -133,7 +133,7 @@
           style="font-family: 'SF Pro Display', -apple-system, sans-serif; padding: none;"
           id="code"
         >
-          
+        
         </h3>
     </div>
       <div class="numpad grid grid-cols-3 gap-3">
@@ -192,10 +192,10 @@
           9
         </button>
         <button
-          class="numpad-btn h-[75px] rounded-full bg-[#F5F5F7] flex items-center justify-center text-[16px] font-normal text-[#1D1D1F] cursor-pointer hover:bg-[#E5E5E5] active:bg-[#D1D1D6]"
-          style="font-family: 'SF Pro Display', -apple-system, sans-serif"
+          class="numpad-btn h-[75px] rounded-full bg-[#F5F5F7] flex items-center justify-center text-[27px] text-[#1D1D1F] cursor-pointer hover:bg-[#E5E5E5] active:bg-[#D1D1D6]"
+          id="done"
         >
-          Vissza
+          <i class="ri-check-line text-2xl"></i>
         </button>
         <button
           class="numpad-btn h-[75px] rounded-full bg-[#F5F5F7] flex items-center justify-center text-[27px] font-light text-[#1D1D1F] cursor-pointer hover:bg-[#E5E5E5] active:bg-[#D1D1D6]"
@@ -209,11 +209,12 @@
         >
           <i class="ri-delete-back-2-line text-2xl"></i>
         </button>
+        
         <button
-          class="numpad-btn h-[75px] rounded-full bg-[#F5F5F7] flex items-center justify-center text-[27px] text-[#1D1D1F] cursor-pointer hover:bg-[#E5E5E5] active:bg-[#D1D1D6]"
-          id="done"
+          class="numpad-btn h-[20px] rounded-full bg-[#F5F5F7] flex items-center justify-center text-[16px] font-normal text-[#1D1D1F] cursor-pointer hover:bg-[#E5E5E5] active:bg-[#D1D1D6]"
+          style="font-family: 'SF Pro Display', -apple-system, sans-serif; margin-top: 15px"
         >
-          <i class="ri-check-line text-2xl"></i>
+          Vissza
         </button>
       </div>
     </div>
@@ -298,7 +299,14 @@ page += 1;
         });
       });
       function updateDisplay() {
-        document.getElementById("code").innerText = code
+        if (code === "") {
+          code = ""
+          document.getElementById("code").innerText = code
+        } else {
+          document.getElementById("code").innerText = code
+        }
+
+        
         //console.log(code)
       }
       let data;

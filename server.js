@@ -144,8 +144,9 @@ app.post("/api/points/register", async (req, res) => {
         await logs.createEntry({
             userid: userid,
             stationid: stationid,
-            points: point,
+            points: "+" + point,
             log: true,
+            goodLog: true
         })
 
         addPoint(userid, point)
@@ -200,6 +201,13 @@ app.post("/api/users/edit", async (req, res) => {
             class: newuserclass,
         })
 
+        await logs.createEntry({
+            userid: newuserid,
+            stationid: "Admin Panel",
+            points: newuserpoints,
+            log: true,
+        })
+
         res.json({
             success: true,
             message: "Felhasználó frissítve."
@@ -248,6 +256,10 @@ app.get("/api/users/list", async(req, res) => {
     res.send(await users.getEntries({ user: true }))
 })
 
+app.get("/api/test", async(req, res) => {
+    res.sendFile(__dirname + "/public/admin/test.html")
+})
+
 app.get("/api/users/delete/all", async(req, res) => {
     await users.deleteEntries({ user: true })
 })
@@ -279,9 +291,20 @@ app.delete("/api/users/delete/:id", async(req, res) => {
     }
 })
 
+
 app.get("/loaderio-ea430d8686d5edd4219c4a442d1e3dca.txt", (req, res) => {
     res.sendFile(__dirname + "/loaderio-ea430d8686d5edd4219c4a442d1e3dca.txt")
 })
+
+app.get("/admin/logs", (req, res) => {
+    res.sendFile(__dirname + "/public/admin/logs.html")
+})
+
+app.get("/api/logs/delete/all", (req, res) => {
+    logs.deleteEntries({ log: true })
+    res.status(200).json({ success: true, message: "Deleted all logs." })
+})
+
 
 
 
@@ -293,6 +316,6 @@ app.get("/loaderio-ea430d8686d5edd4219c4a442d1e3dca.txt", (req, res) => {
 //})
 
 
-app.listen(process.env.PORT || 3000, () => {
+app.listen(process.env.PORT || 3000, "192.168.1.156", () => {
     console.log(`Server is running on port ${process.env.PORT || 3000}`)
 })

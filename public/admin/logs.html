@@ -20,7 +20,7 @@
         theme: {
           extend: {
             colors: {
-              primary: "#007AFF",
+              primary: "#f53131",
               secondary: "#86868B",
             },
             borderRadius: {
@@ -59,66 +59,47 @@
         id="sidebar"
       >
         <div class="p-6">
-          <h1 class="font-['Pacifico'] text-2xl text-primary mb-8">Üdvözletem!</h1>
+          <h1 class="font-['Pacifico'] text-2xl text-primary mb-8">Admin Portál</h1>
           <nav class="space-y-2">
             <a
-              href="/dashboard"
+              href="/admin"
               class="sidebar-item flex items-center px-4 py-3 rounded-lg text-gray-700"
             >
               <i
                 class="ri-dashboard-line w-5 h-5 flex items-center justify-center mr-3"
               ></i>
-              Állomások
+              Állomások kezelése
             </a>
             <a
-              href="#"
-              class="sidebar-item active flex items-center px-4 py-3 rounded-lg text-gray-700"
+              href="/admin/users"
+              class="sidebar-item flex items-center px-4 py-3 rounded-lg text-gray-700"
             >
               <i
                 class="ri-user-line w-5 h-5 flex items-center justify-center mr-3"
               ></i>
-              Felhasználók
+              Felhasználók kezelése
             </a>
-            <div class="relative" id="adminDropdown">
-              <button
-                class="sidebar-item flex items-center px-4 py-3 rounded-lg text-gray-700 w-full"
-                onclick="toggleDropdown()"
-              >
-                <i
-                  class="ri-settings-line w-5 h-5 flex items-center justify-center mr-3"
-                ></i>
-                Adminisztrátor
-                <i
-                  class="ri-arrow-down-s-line w-5 h-5 flex items-center justify-center ml-auto"
-                ></i>
-              </button>
-              <div
-                class="hidden absolute left-0 w-full bg-white shadow-lg rounded-lg mt-2 py-2"
-                id="dropdownMenu"
-              >
-              <a
-              href="/admin/"
-              class="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-              >Állomások kezelése</a
-            >
-            <a
-              href="/admin/users"
-              class="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-              >Felhasználók kezelése</a
-            >
-            <a
-              href="/admin/analytics"
-              class="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-              >Analitika</a
-            >
 
             <a
-              href="/admin/logs"
-              class="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-              >Napló</a
+              href="/admin/analytics"
+              class="sidebar-item flex items-center px-4 py-3 rounded-lg text-gray-700"
             >
-              </div>
-            </div>
+              <i
+                class="ri-bar-chart-line w-5 h-5 flex items-center justify-center mr-3"
+              ></i>
+              Statisztika
+            </a>
+
+            <a
+              href="#"
+              class="active sidebar-item flex items-center px-4 py-3 rounded-lg text-gray-700"
+            >
+              <i
+                class="ri-sticky-note-line w-5 h-5 flex items-center justify-center mr-3"
+              ></i>
+              Napló
+            </a>
+            
           </nav>
         </div>
         <div class="absolute bottom-0 w-full p-6">
@@ -144,7 +125,7 @@
       >
         <div class="bg-white rounded-lg shadow-md p-6">
           <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-semibold">Felhasználók</h2>
+            <h2 class="text-xl font-semibold">Napló</h2>
             <div class="flex gap-4">
               <div class="relative">
                 <input
@@ -157,15 +138,7 @@
                   class="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 flex items-center justify-center"
                 ></i>
               </div>
-              <button
-                onclick="openModal()"
-                class="bg-primary text-white px-4 py-2 rounded-button hover:bg-primary/90 transition-colors flex items-center gap-2"
-              >
-                <i
-                  class="ri-add-line w-4 h-4 flex items-center justify-center"
-                ></i>
-                Új felhasználó
-              </button>
+              
               <div
                 id="userModal"
                 class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center"
@@ -188,7 +161,7 @@
                     <div>
                       <label
                         class="block text-sm font-medium text-gray-700 mb-1"
-                        >Név</label
+                        >Állomás</label
                       >
                       <input
                         type="text"
@@ -261,19 +234,16 @@
               <thead>
                 <tr class="border-b">
                   <th class="text-left py-4 px-4 font-medium text-gray-600">
-                    Név
+                    Játékos
                   </th>
                   <th class="text-left py-4 px-4 font-medium text-gray-600">
-                    Szám
+                    Azonosító
                   </th>
                   <th class="text-left py-4 px-4 font-medium text-gray-600">
-                    Osztály
+                    Állomás
                   </th>
                   <th class="text-left py-4 px-4 font-medium text-gray-600">
-                    Utolsó állomás
-                  </th>
-                  <th class="text-right py-4 px-4 font-medium text-gray-600">
-                    ∑
+                    Pont
                   </th>
                 </tr>
               </thead>
@@ -406,56 +376,94 @@
         renderUsers();
       </script-->
     <script>
-      let jsonStringg = []; // Stores fetched user data
+let jsonStringg = []; // Stores fetched user data
 let mUsers = []; // Stores processed user data
 
 async function initUsers() {
     try {
-        const response = await fetch(`/api/users/list`, {
+        const response = await fetch(`/api/logs/list`, {
             method: 'GET',
         });
 
         jsonStringg = await response.json(); // Fetch JSON response
         console.log("Fetched Data:", jsonStringg); // Debugging
 
-        // Extract user list from JSON (if nested inside "users")
         let dataArray = Array.isArray(jsonStringg) ? jsonStringg : jsonStringg.users || [];
-
-        mUsers = parseJsonToArray(dataArray);
-        console.log(dataArray);
+        
+        mUsers = await parseJsonToArray(dataArray);
+        console.log(mUsers);
         renderUsers(mUsers); // Render the fetched users
     } catch (error) {
         console.error("Fetching error: " + error);
     }
 }
 
-function parseJsonToArray(data) {
+async function fetchUserDetails(userId) {
+    try {
+        const response = await fetch(`/api/users/get/${userId}`);
+        const data = await response.json();
+        return data[0]?.data?.name || "Unknown User";
+    } catch (error) {
+        console.error(`Error fetching user ${userId}:`, error);
+        return "Unknown User";
+    }
+}
+
+async function fetchUserNumber(userId) {
+    try {
+        const response = await fetch(`/api/users/get/${userId}`);
+        const data = await response.json();
+        return data[0]?.data?.number || "Unknown User";
+    } catch (error) {
+        console.error(`Error fetching user ${userId}:`, error);
+        return "Unknown User";
+    }
+}
+
+async function fetchStationDetails(stationId) {
+    try {
+        const response = await fetch(`/api/stations/get/${stationId}`);
+        const data = await response.json();
+        return data[0]?.data?.name ? `${data[0].data.name} (ID: ${data[0].data.number})` : "Ismeretlen Állomás (Feltehetően: Admin Panel)";
+    } catch (error) {
+        console.error(`Error fetching station ${stationId}:`, error);
+        return "Ismeretlen Állomás (Feltehetően: Admin Panel)";
+    }
+}
+
+async function parseJsonToArray(data) {
     if (!Array.isArray(data) || data.length === 0) return [];
 
-    return data.map(item => ({
-        name: item.name || item.data?.name || "Unknown",
-        number: item.number || item.data?.number || "Unknown",
-        class: item.class || item.data?.class || "Unknown",
-        lastStation: "-", // Placeholder
-        sum: item.points || item.data?.points || "N/A",
-        _entryId: item._entryId || item.data?._entryId || "#" // Ensure a valid ID is present
-    }));
+    return await Promise.all(
+        data.map(async item => {
+            const userId = item.userid || item.data?.userid || "Unknown";
+            const stationId = item.stationid || item.data?.stationid || "Unknown";
+            const points = item.points || item.data?.points || "Unknown";
+            const _entryId = item._entryId || item.data?._entryId || "#";
+
+            const userName = await fetchUserDetails(userId);
+            const stationName = await fetchStationDetails(stationId);
+            const useridd = await fetchUserNumber(userId)
+
+            return { userid: userName, stationid: stationName, points, _entryId, useridd };
+        })
+    );
 }
 
 function renderUsers(users) {
     const tbody = document.getElementById("userTableBody");
-    tbody.innerHTML = users //<td class="py-4 px-4"><a href="/users/${user._entryId}">${user.name}</a></td>
+    tbody.innerHTML = users
         .map(user => `
             <tr class="border-b hover:bg-gray-50">
-                <td class="py-4 px-4">${user.name}</td>
-                <td class="py-4 px-4">${user.number}</td>
-                <td class="py-4 px-4">${user.class}</td>
-                <td class="py-4 px-4">${user.lastStation}</td>
-                <td class="py-4 px-4 text-right font-medium">${user.sum}</td>
+                <td class="py-4 px-4">${user.userid}</td>
+                <td class="py-4 px-4">${user.useridd}</td>
+                <td class="py-4 px-4">${user.stationid}</td>
+                <td class="py-4 px-4">${user.points}</td>
             </tr>
         `)
         .join("");
 }
+
 
 function searchUsers(searchTerm) {
     const filteredUsers = mUsers.filter(user =>
@@ -531,11 +539,10 @@ initUsers();
     </script>
     <script>
       function logout() {
-        window.sessionStorage.removeItem("logged")
         window.sessionStorage.removeItem("admin-logged")
         window.location.href = "/"
       }
     </script>
-    <script src="/js/auth.js"></script>
+    <script src="/js/auth-admin.js"></script>
   </body>
 </html>
