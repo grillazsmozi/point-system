@@ -1,5 +1,12 @@
 const express = require("express")
 const { Client, marcsync } = require("marcsync")
+const http = require('http');
+const socketIo = require('socket.io');
+
+const server = http.createServer(app);
+const io = socketIo(server);
+
+const user = {};
 
 // SYSTEM SETTINGS
 const SETTINGS = {
@@ -305,8 +312,8 @@ app.get("/api/logs/delete/all", (req, res) => {
     res.status(200).json({ success: true, message: "Deleted all logs." })
 })
 
-
-
+/*/
+/*/
 
 
 
