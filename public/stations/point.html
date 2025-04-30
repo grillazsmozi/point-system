@@ -106,7 +106,24 @@
       };
     </script>
   </head>
-  <body class="min-h-screen bg-white">
+  <body class="min-h-screen bg-white"> <!-- --> 
+    <div id="sidebar" class="fixed top-0 left-0 h-80 w-64 bg-white -translate-x-full shadow-lg transform transition-transform duration-300 z-50 rounded-xl">
+      <div class="flex items-center justify-between px-4 py-3 border-b">
+        <h2 class="text-lg font-semibold text-[#1D1D1F]" style="font-family: 'SF Pro Display'">Profil</h2>
+        <!-- nyíl gomb -->
+        <button id="toggleSidebar" class="text-2xl text-[#1D1D1F] focus:outline-none">
+          <i class="ri-arrow-right-s-line"></i>
+        </button>
+      </div>
+      <div class="p-4 text-[#1D1D1F]" style="font-family: 'SF Pro Display'" id="profile-desc">
+        Adjon meg játékos azonosítót...
+      </div>
+    </div>
+    <!-- Gomb, ami megjelenik zárt állapotban is -->
+<button id="openSidebar" class="fixed top-4 left-0 z-40 bg-white border-r rounded-r-md px-2 py-1 shadow text-[#1D1D1F] text-xl">
+  <i class="ri-arrow-left-s-line"></i>
+</button>
+
     <div class="max-w-md mx-auto px-6 py-12">
       <header class="text-center mb-16 opacity-0">
         <h1
@@ -114,7 +131,7 @@
           style="font-family: 'SF Pro Display', -apple-system, sans-serif"
           id="stationName"
         >
-          Állomás név
+          Betöltés...
         </h1>
         <p
           class="text-[#86868B]"
@@ -227,7 +244,9 @@
 
     <script>
       let code = "";
-
+      const sidebar = document.getElementById("sidebar");
+      const toggleBtn = document.getElementById("toggleSidebar");
+      const openBtn = document.getElementById("openSidebar");
       const numpadBtns = document.querySelectorAll(".numpad-btn");
       const validCode = "123456";
       let page = 0
@@ -267,6 +286,8 @@ console.log(reply); // Debugging
 if (Array.isArray(reply) && reply.length > 0) {
     // Assuming _entryId is inside the first object in the array
     document.getElementById("userid").value = reply[0]._entryId || "N/A"; 
+    document.getElementById("profile-desc").innerText = `Név: ${reply[0].data.name}\nAzonosító: ${reply[0].data.number}\nOsztály: ${reply[0].data.class}\n∑ ${reply[0].data.points} pont`
+    sidebar.classList.remove("-translate-x-full");
 } else {
     console.error("Invalid or empty response:", reply);
 }
@@ -349,7 +370,21 @@ page += 1;
       };
 
     fetchStationData();
+    
+      toggleBtn.addEventListener("click", () => {
+        sidebar.classList.add("-translate-x-full");
+        openBtn.classList.remove("hidden");
+      });
+    
+      openBtn.addEventListener("click", () => {
+        sidebar.classList.remove("-translate-x-full");
+        openBtn.classList.add("hidden");
+      });
     </script>
+    <script>
+      
+    </script>
+    
     <script src="/js/auth.js"></script>
   </body>
 </html>

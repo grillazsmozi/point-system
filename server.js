@@ -1,12 +1,6 @@
 const express = require("express")
 const { Client, marcsync } = require("marcsync")
 const http = require('http');
-const socketIo = require('socket.io');
-
-const server = http.createServer(app);
-const io = socketIo(server);
-
-const user = {};
 
 // SYSTEM SETTINGS
 const SETTINGS = {
@@ -255,7 +249,7 @@ app.get("/api/users/get-id/:id", async(req, res) => {
     try {
         res.send(await users.getEntries({ number: req.params.id }))
     } catch (error) {
-        res.status(500).json({ success: false, message: "Nem található felhasználó." })
+        res.status(400).json({ success: false, message: "Nem található felhasználó." })
     }
 })
 
