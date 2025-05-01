@@ -1,6 +1,7 @@
 const express = require("express")
 const { Client, marcsync } = require("marcsync")
 const http = require('http');
+const path = require('path');
 
 // SYSTEM SETTINGS
 const SETTINGS = {
@@ -107,7 +108,7 @@ app.post("/api/stations/register", async (req, res) => {
                 name: newname,
                 number: newnumber,
                 points: newpoints,
-                image: newimage || "https://static.vecteezy.com/system/resources/previews/027/231/654/non_2x/illustration-graphic-of-aesthetic-background-template-with-simple-and-minimalist-pastel-colors-vector.jpg",
+                image: newimage || "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
                 station: true,
             });
 
@@ -140,7 +141,7 @@ app.post("/api/points/register", async (req, res) => {
     try {
         const { userid, stationid, point } = req.body;
 
-        console.log(userid)
+        //console.log(userid)
 
         await logs.createEntry({
             userid: userid,
@@ -222,11 +223,21 @@ app.post("/api/users/edit", async (req, res) => {
 })
 
 app.get("/api/stations/list", async(req, res) => {
-    res.send(await stations.getEntries({ station: true }))
+    try {
+        res.send(await stations.getEntries({ station: true }))
+    } catch (error) {
+        res.status(500).json({ success: false, message: `Internal Server Error` })     
+        console.log(error) 
+    }
 })
 
 app.get("/api/logs/list", async(req, res) => {
-    res.send(await logs.getEntries({ log: true }))
+    try {
+        res.send(await logs.getEntries({ log: true }))
+    } catch (error) {
+        res.status(500).json({ success: false, message: `Internal Server Error` })     
+        console.log(error) 
+    }
 })
 
 app.get("/api/stations/get/:id", async(req, res) => {
@@ -236,6 +247,17 @@ app.get("/api/stations/get/:id", async(req, res) => {
         res.status(500).json({ success: false, message: "Nem található felhasználó." })
     }
 })
+
+app.get('/api/sounds/:name', (req, res) => {
+    const soundName = req.params.name;
+    const filePath = path.join(__dirname, 'public', 'sounds', soundName);
+
+    res.sendFile(filePath, (err) => {
+        if (err) {
+            res.status(404).json({ error: 'Sound not found' });
+        }
+    });
+});
 
 app.get("/api/users/get/:id", async(req, res) => {
     try {
@@ -254,7 +276,12 @@ app.get("/api/users/get-id/:id", async(req, res) => {
 })
 
 app.get("/api/users/list", async(req, res) => {
-    res.send(await users.getEntries({ user: true }))
+    try {
+        res.send(await users.getEntries({ user: true }))
+    } catch (error) {
+        res.status(500).json({ success: false, message: `Internal Server Error` })     
+        console.log(error) 
+    }
 })
 
 app.get("/api/test", async(req, res) => {

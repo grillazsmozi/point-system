@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Enter Code</title>
+    <title>Sorverseny | Betöltés</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
@@ -109,7 +109,7 @@
   <body class="min-h-screen bg-white"> <!-- --> 
     <div id="sidebar" class="fixed top-0 left-0 h-80 w-64 bg-white -translate-x-full shadow-lg transform transition-transform duration-300 z-50 rounded-xl">
       <div class="flex items-center justify-between px-4 py-3 border-b">
-        <h2 class="text-lg font-semibold text-[#1D1D1F]" style="font-family: 'SF Pro Display'">Profil</h2>
+        <h2 id="profile-title" class="text-lg font-semibold text-[#1D1D1F]" style="font-family: 'SF Pro Display'">Profil</h2>
         <!-- nyíl gomb -->
         <button id="toggleSidebar" class="text-2xl text-[#1D1D1F] focus:outline-none">
           <i class="ri-arrow-right-s-line"></i>
@@ -281,7 +281,7 @@
 
 const reply = await request.json(); // ✅ Await the JSON response
 
-console.log(reply); // Debugging
+//console.log(reply); // Debugging
 
 if (Array.isArray(reply) && reply.length > 0) {
     // Assuming _entryId is inside the first object in the array
@@ -289,7 +289,24 @@ if (Array.isArray(reply) && reply.length > 0) {
     document.getElementById("profile-desc").innerText = `Név: ${reply[0].data.name}\nAzonosító: ${reply[0].data.number}\nOsztály: ${reply[0].data.class}\n∑ ${reply[0].data.points} pont`
     sidebar.classList.remove("-translate-x-full");
 } else {
+    sidebar.classList.add("bg-red-500/100")
+    document.getElementById("profile-title").innerText = `Hiba`
+    document.getElementById("profile-desc").innerText = `Felhasználó nem található!\nPróbáld újra!\n\nVisszatérés 3mp múlva...`
+    const errorSound = new Audio("/api/sounds/hands_on_steering_wheel.mp3")
+
+    errorSound.play()
+    sidebar.classList.remove("-translate-x-full");
     console.error("Invalid or empty response:", reply);
+    setInterval(() => {
+       document.getElementById("profile-desc").innerText = `Felhasználó nem található!\nPróbáld újra!\n\nVisszatérés 2mp múlva...`
+      setInterval(() => {
+         document.getElementById("profile-desc").innerText = `Felhasználó nem található!\nPróbáld újra!\n\nVisszatérés 1mp múlva...`
+          setInterval(() => {
+             document.getElementById("profile-desc").innerText = `Felhasználó nem található!\nPróbáld újra!\n\nVisszatérés...`
+             window.location.reload()
+          }, 1000);
+        }, 1000);
+      }, 1000);
 }
 
 code = "";
@@ -304,9 +321,12 @@ page += 1;
 
               if (codeInt <= pointsInt) {
                 document.getElementById("point").value = codeInt
-                console.log("Subform");
+                //console.log("Subform");
                 subform();
               } else {
+                const errorSound = new Audio("/api/sounds/hands_on_steering_wheel.mp3")
+
+    errorSound.play()
                 document.getElementById("desc").innerText = `A maximumnál több pont nem adható! (Max: ${data[0].data.points})`;
               }
             }
@@ -346,25 +366,53 @@ page += 1;
           });
 
           data = await response.json(); // Parse the JSON response
-          console.log(data);
+          //console.log(data);
         } catch (error) {
           console.error("Error:", error); // Handle errors
         }
 
         document.getElementById("stationName").innerText = `Állomás: ${data[0].data.name} (Azonosító: ${data[0].data.number})`
         document.getElementById("stationid").value = data[0].data._id
+        document.title = `Sorverseny | ${data[0].data.name} (#${data[0].data.number})`
       }
 
       async function subform(){
 
         const formData = new FormData(document.getElementById("newUserForm"));
 
+        
+        const successSound = new Audio("/api/sounds/park_assist_orange.mp3")
+
+   successSound.play()
+   const overlay = document.createElement("div");
+          overlay.className =
+            "fixed inset-0 bg-white bg-opacity-95 flex items-center justify-center z-50 opacity-0 transition-opacity duration-300";
+          overlay.innerHTML = `
+      <div class="text-center">
+      <div class="inline-block w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin" id="loadingSpinner"></div>
+      <div class="hidden text-primary text-6xl mb-2" id="successIcon"><i class="ri-checkbox-circle-fill"></i></div>
+      <p class="mt-4 text-lg text-[#1D1D1F] font-medium" style="font-family: 'SF Pro Display', -apple-system, sans-serif" id="statusText">Érvényesítés...</p>
+      </div>
+      `;
+          document.body.appendChild(overlay);
+          requestAnimationFrame(() => {
+            overlay.style.opacity = "1";
+          });
+
+          const loadingSpinner = overlay.querySelector("#loadingSpinner");
+            const successIcon = overlay.querySelector("#successIcon");
+            const statusText = overlay.querySelector("#statusText");
+            loadingSpinner.style.display = "none";
+            successIcon.style.display = "block";
+            statusText.textContent = "Érvényesítve!";
         const response = await fetch('/api/points/register', {
             method: "POST",
             body: new URLSearchParams(formData),
         })
 
-        window.location.reload()
+        setInterval(() => {
+          window.location.reload()
+        }, 1000);
 
         document.getElementById("newUserForm").reset();
       };
