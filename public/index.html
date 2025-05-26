@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Enter Code</title>
+    <title>Sorverseny | Belépés</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
@@ -224,7 +224,24 @@
       let code = "";
       const circles = document.querySelectorAll(".code-circle");
       const numpadBtns = document.querySelectorAll(".numpad-btn");
-      const validCode = "088088";
+      let validCode = "";
+
+      fetch('/api/settings/get/login-code')
+      .then(response => response.text())
+        .then(text => {
+          console.log('Raw response:', text);
+          validCode = text
+          try {
+            const data = JSON.parse(text); // only if needed
+            console.log('Parsed JSON:', data);
+          } catch (e) {
+            console.error('Invalid JSON:', e);
+          }
+        })
+        .catch(error => {
+          console.error('Fetch error:', error);
+        });
+
       document.addEventListener("DOMContentLoaded", () => {
         // Animate header
         document.querySelector("header").classList.add("fade-in-down");

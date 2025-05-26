@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sorverseny | Betöltés</title>
+    <title>Sorverseny Állomás | Betöltés</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
@@ -289,6 +289,7 @@ if (Array.isArray(reply) && reply.length > 0) {
     document.getElementById("profile-desc").innerText = `Név: ${reply[0].data.name}\nAzonosító: ${reply[0].data.number}\nOsztály: ${reply[0].data.class}\n∑ ${reply[0].data.points} pont`
     sidebar.classList.remove("-translate-x-full");
 } else {
+    document.getElementById("done").disabled = true
     sidebar.classList.add("bg-red-500/100")
     document.getElementById("profile-title").innerText = `Hiba`
     document.getElementById("profile-desc").innerText = `Felhasználó nem található!\nPróbáld újra!\n\nVisszatérés 3mp múlva...`

@@ -7,7 +7,10 @@ const path = require('path');
 const SETTINGS = {
     "users_collection": "test_users2",
     "logs_collection": "test_logs",
-    "stations_collection": "test_stations"
+    "stations_collection": "test_stations",
+    "settings_collection": "settings",
+    "login-code": "088088",
+    "admin-login-code": "326109"
 }
 
 const MS = new Client(process.env.TOKEN || "eyJhbGciOiJIUzI1NiIsInR5cCI6Im1hcmNzeW5jQWNjZXNzIn0.eyJkYXRhYmFzZUlkIjoiZjM2YTQwMjYtNTY3ZC00ZDFkLWFjNWUtYmMyZTAyMWNhYTA5IiwidXNlcklkIjoiMGEzMWFkM2UtNDQ5Ny00NDQwLTljNzEtMjNlMDIxMzQyYzRjIiwidG9rZW5JZCI6IjY3Y2YxODQ5NDczNWJlMDg2OWU0ZTU4ZiIsIm5iZiI6MTc0MTYyNTQxNywiZXhwIjo4ODE0MTUzOTAxNywiaWF0IjoxNzQxNjI1NDE3LCJpc3MiOiJtYXJjc3luYyJ9.0Y7fFpN9bV-ezqw2wRd5ta0pzLslZlaOiVc6KKmsx6Y")
@@ -17,8 +20,10 @@ const app = express()
 let users = MS.getCollection("test_users")
 let logs = MS.getCollection("test_logs")
 let stations = MS.getCollection("test_stations")
+let settings = MS.getCollection("settings")
 
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json())
 
 // ENDPOINTS
 
@@ -328,9 +333,33 @@ app.get("/admin/logs", (req, res) => {
     res.sendFile(__dirname + "/public/admin/logs.html")
 })
 
+app.get("/admin/settings", (req, res) => {
+    res.sendFile(__dirname + "/public/admin/settings.html")
+})
+
 app.get("/api/logs/delete/all", (req, res) => {
     logs.deleteEntries({ log: true })
     res.status(200).json({ success: true, message: "Deleted all logs." })
+})
+
+app.get("/api/settings/get/:name", (req, res) => {
+    const name = req.params.name
+    try {
+        res.send(SETTINGS[name])
+    } catch (error) {
+        res.status(500).json({ success: false, message: `Sikertelen lekérés (ERR_SERVER: ${error})` })
+    }
+})
+
+app.post("/api/settings/post/:name/:value", (req, res) => {
+    const name = req.params.name
+    const value = req.params.value
+    try {
+        SETTINGS[name] = value
+        res.status(200).json({ success: true, message: "Edited setting." })
+    } catch (error) {
+        res.status(500).json({ success: false, message: `Sikertelen lekérés (ERR_SERVER: ${error})` })
+    }
 })
 
 /*/

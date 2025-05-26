@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="hu">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sorverseny | Beállítások</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" />
+    <style>
+      label { font-weight: 600; }
+      input { width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 8px; }
+      button { background-color: #007AFF; color: white; padding: 0.5rem 1rem; border-radius: 8px; }
+    </style>
+  </head>
+  <body class="bg-[#F5F5F7] p-6">
+    <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow">
+      <h1 class="text-2xl font-bold mb-4">Beállítások szerkesztése</h1>
+
+      <div class="mb-4">
+        <label for="loginCode">Login kód:</label>
+        <input type="text" id="loginCode" />
+        <button onclick="updateSetting('login-code', document.getElementById('loginCode').value)" class="mt-2">Mentés</button>
+      </div>
+
+      <div class="mb-4">
+        <label for="adminLoginCode">Admin login kód:</label>
+        <input type="text" id="adminLoginCode" />
+        <button onclick="updateSetting('admin-login-code', document.getElementById('adminLoginCode').value)" class="mt-2">Mentés</button>
+      </div>
+
+      <div id="status" class="mt-4 text-sm text-gray-600"></div>
+    </div>
+
+    <script>
+      async function fetchSetting(name, inputId) {
+        try {
+          const res = await fetch(`/api/settings/get/${name}`);
+          const value = await res.text();
+          document.getElementById(inputId).value = value;
+        } catch (e) {
+          console.error("Hiba a beállítás lekérésénél:", e);
+        }
+      }
+
+      async function updateSetting(name, value) {
+        try {
+          const res = await fetch(`/api/settings/post/${name}/${value}`, { method: "POST" });
+          document.getElementById("status").textContent = "Mentés sikeres.";
+        } catch (e) {
+          document.getElementById("status").textContent = "Hiba mentés közben.";
+          console.error("Mentési hiba:", e);
+        }
+      }
+
+      // Initial fetch
+      fetchSetting("login-code", "loginCode");
+      fetchSetting("admin-login-code", "adminLoginCode");
+    </script>
+  </body>
+</html>
