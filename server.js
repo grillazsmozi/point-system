@@ -474,7 +474,7 @@ app.post("/api/support/request/:station", async (req, res) => {
 //})
 
 
-server.listen(process.env.PORT || 3000, "192.168.1.24", async () => {
+server.listen(process.env.PORT || 3000, async () => {
     await startup()
     console.log(`Server is running on port ${process.env.PORT || 3000}`)
 });
