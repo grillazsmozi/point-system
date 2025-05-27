@@ -241,7 +241,26 @@
       <input type="hidden" id="stationid" name="stationid">
       <input type="hidden" id="point" name="point">
     </form>
-
+    <button id="supportCallBtn" style="
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+  width: 60px;
+  height: 60px;
+  background-color: #e53935;
+  border: none;
+  border-radius: 50%;
+  color: white;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  cursor: pointer;
+">
+  <i class="ri-phone-fill"></i>
+</button>
     <script>
       let code = "";
       const sidebar = document.getElementById("sidebar");
@@ -249,6 +268,7 @@
       const openBtn = document.getElementById("openSidebar");
       const numpadBtns = document.querySelectorAll(".numpad-btn");
       const validCode = "123456";
+      let StationName = ""
       let page = 0
 
       document.addEventListener("DOMContentLoaded", () => {
@@ -375,6 +395,7 @@ page += 1;
         document.getElementById("stationName").innerText = `Állomás: ${data[0].data.name} (Azonosító: ${data[0].data.number})`
         document.getElementById("stationid").value = data[0].data._id
         document.title = `Sorverseny | ${data[0].data.name} (#${data[0].data.number})`
+        StationName = data[0].data.name
       }
 
       async function subform(){
@@ -429,11 +450,27 @@ page += 1;
         sidebar.classList.remove("-translate-x-full");
         openBtn.classList.add("hidden");
       });
-    </script>
-    <script>
-      
-    </script>
-    
+
+      document.getElementById('supportCallBtn').addEventListener('click', async function () {
+        const confirmed = confirm('Biztos, hogy szeretnél segítséget hívni?');
+
+        if (confirmed) {
+
+          await fetch(`/api/support/request/${StationName}`, {
+            method: 'POST',
+            headers: {},
+            body: {},
+          })
+          .then(res => res.json())
+          .then(data => console.log(data))
+          .catch(err => console.error(err));
+
+          alert("Egyik adminisztrátort értesítettük!")
+
+          console.log('Support call initiated');
+        }
+      });
+    </script> 
     <script src="/js/auth.js"></script>
   </body>
 </html>

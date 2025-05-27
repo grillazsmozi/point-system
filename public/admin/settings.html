@@ -28,6 +28,12 @@
         <button onclick="updateSetting('admin-login-code', document.getElementById('adminLoginCode').value)" class="mt-2">Mentés</button>
       </div>
 
+      <div class="mb-4">
+        <label for="supportEmail">Értesítési e-mail:</label>
+        <input type="text" id="supportEmail" />
+        <button onclick="updateSetting('support-notification-email', document.getElementById('supportEmail').value)" class="mt-2">Mentés</button>
+      </div>
+
       <div id="status" class="mt-4 text-sm text-gray-600"></div>
     </div>
 
@@ -55,6 +61,7 @@
       // Initial fetch
       fetchSetting("login-code", "loginCode");
       fetchSetting("admin-login-code", "adminLoginCode");
+      fetchSetting("support-notification-email", "supportEmail");
     </script>
   </body>
 </html>

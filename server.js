@@ -1,7 +1,11 @@
 const express = require("express")
 const { Client, marcsync } = require("marcsync")
+const date_fns = require('date-fns');
 const http = require('http');
 const path = require('path');
+const nodemailer = require("nodemailer")
+const { Server } = require('socket.io');
+
 
 // SYSTEM SETTINGS
 const SETTINGS = {
@@ -9,13 +13,22 @@ const SETTINGS = {
     "logs_collection": "test_logs",
     "stations_collection": "test_stations",
     "settings_collection": "settings",
-    "login-code": "088088",
-    "admin-login-code": "326109"
+    "login-code": "088088", //088088
+    "admin-login-code": "326109", //326109
+    "support-notification-email": "baloghtlevente@gmail.com" //"baloghtlevente@gmail.com"
 }
 
 const MS = new Client(process.env.TOKEN || "eyJhbGciOiJIUzI1NiIsInR5cCI6Im1hcmNzeW5jQWNjZXNzIn0.eyJkYXRhYmFzZUlkIjoiZjM2YTQwMjYtNTY3ZC00ZDFkLWFjNWUtYmMyZTAyMWNhYTA5IiwidXNlcklkIjoiMGEzMWFkM2UtNDQ5Ny00NDQwLTljNzEtMjNlMDIxMzQyYzRjIiwidG9rZW5JZCI6IjY3Y2YxODQ5NDczNWJlMDg2OWU0ZTU4ZiIsIm5iZiI6MTc0MTYyNTQxNywiZXhwIjo4ODE0MTUzOTAxNywiaWF0IjoxNzQxNjI1NDE3LCJpc3MiOiJtYXJjc3luYyJ9.0Y7fFpN9bV-ezqw2wRd5ta0pzLslZlaOiVc6KKmsx6Y")
 
 const app = express()
+
+const server = http.createServer(app);
+
+const io = new Server(server);
+
+io.on('connection', (socket) => {
+  //console.log('Kapcsolódott:', socket.id);
+});
 
 let users = MS.getCollection("test_users")
 let logs = MS.getCollection("test_logs")
@@ -24,6 +37,45 @@ let settings = MS.getCollection("settings")
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json())
+app.use(express.static(path.join(__dirname, 'public')));
+
+const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+    auth: {
+        user: "aa.leviproductions@gmail.com",
+        pass: "rbiy pceh gzwm wrcc",
+    }
+})
+
+async function sendMail(to, title, msg) {
+  const info = await transporter.sendMail({
+    from: '"Sorverseny Hibaközpont" <baloghtlevente@gmail.com>',
+    to: to,
+    subject: title,
+    text: msg,
+    html: "",
+  })
+  //console.log("Message sent:", info.messageId)
+}
+
+async function startup() {
+    if (!SETTINGS["login-code"] || SETTINGS["login-code"] === "") {
+        sendMail("baloghtlevente@gmail.com", "Startup Error", "ERROR: Missing login code. Server usage is not recommended!")
+        console.log("ERROR: Missing login code. Server usage is not recommended!")
+    }
+
+    if (!SETTINGS["admin-login-code"] || SETTINGS["admin-login-code"] === "") {
+        sendMail("baloghtlevente@gmail.com", "Startup Error", "ERROR: Missing admin login code. Server usage is not recommended!")
+        console.log("ERROR: Missing admin login code. Server usage is not recommended!")
+    }
+
+    if (!SETTINGS["support-notification-email"] || SETTINGS["support-notification-email"] === "") {
+        sendMail("baloghtlevente@gmail.com", "Startup Error", "ERROR: Missing support email. Server usage is not recommended!")
+        console.log("ERROR: Missing support email. Server usage is not recommended!")
+    }
+}
 
 // ENDPOINTS
 
@@ -62,6 +114,10 @@ app.get("/js/auth.js", (req, res) => {
 
 app.get("/js/auth-admin.js", (req, res) => {
     res.sendFile(__dirname + "/public/js/auth-admin.js")
+});
+
+app.get("/js/support-request.js", (req, res) => {
+    res.sendFile(__dirname + "/public/js/support-request.js")
 });
 
 
@@ -134,11 +190,16 @@ app.get('/admin/station', (req, res) => {
 
 
 async function addPoint(userid, point) {
-    const user = await users.getEntryById(userid)
+    try {
+        const user = await users.getEntryById(userid)
 
-    await users.updateEntries({ _id: userid }, {
-        points: parseInt(user.data.points) + parseInt(point)
-    })
+        await users.updateEntries({ _id: userid }, {
+            points: parseInt(user.data.points) + parseInt(point)
+        })
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
 }
 
 
@@ -250,6 +311,7 @@ app.get("/api/stations/get/:id", async(req, res) => {
         res.send(await stations.getEntries({ _id: req.params.id }))
     } catch (error) {
         res.status(500).json({ success: false, message: "Nem található felhasználó." })
+        console.log(error)
     }
 })
 
@@ -269,6 +331,7 @@ app.get("/api/users/get/:id", async(req, res) => {
         res.send(await users.getEntries({ _id: req.params.id }))
     } catch (error) {
         res.status(500).json({ success: false, message: "Nem található felhasználó." })
+        console.log(error)
     }
 })
 
@@ -277,6 +340,7 @@ app.get("/api/users/get-id/:id", async(req, res) => {
         res.send(await users.getEntries({ number: req.params.id }))
     } catch (error) {
         res.status(400).json({ success: false, message: "Nem található felhasználó." })
+        console.log(error)
     }
 })
 
@@ -284,7 +348,7 @@ app.get("/api/users/list", async(req, res) => {
     try {
         res.send(await users.getEntries({ user: true }))
     } catch (error) {
-        res.status(500).json({ success: false, message: `Internal Server Error` })     
+        res.status(500).json({ success: false, message: `Internal Server Error` })   
         console.log(error) 
     }
 })
@@ -303,6 +367,7 @@ app.get("/api/users/delete/:id", async(req, res) => {
         res.status(200).json({ success: true, message: "Sikeres törlés!" })
     } catch (error) {
         res.status(500).json({ success: false, message: `Sikertelen törlés! (ERR_SERVER: ${error})` })
+        console.log(error)
     }
 })
 
@@ -312,6 +377,7 @@ app.delete("/api/stations/delete/:id", async(req, res) => {
         res.status(200).json({ success: true, message: "Sikeres törlés!" })
     } catch (error) {
         res.status(500).json({ success: false, message: `Sikertelen törlés! (ERR_SERVER: ${error})` })
+        console.log(error)
     }
 })
 
@@ -321,6 +387,7 @@ app.delete("/api/users/delete/:id", async(req, res) => {
         res.status(200).json({ success: true, message: "Sikeres törlés!" })
     } catch (error) {
         res.status(500).json({ success: false, message: `Sikertelen törlés! (ERR_SERVER: ${error})` })
+        console.log(error)
     }
 })
 
@@ -348,6 +415,7 @@ app.get("/api/settings/get/:name", (req, res) => {
         res.send(SETTINGS[name])
     } catch (error) {
         res.status(500).json({ success: false, message: `Sikertelen lekérés (ERR_SERVER: ${error})` })
+        sendMail("baloghtlevente@gmail.com", "API Error", `ERROR: ${error}`)
     }
 })
 
@@ -359,8 +427,41 @@ app.post("/api/settings/post/:name/:value", (req, res) => {
         res.status(200).json({ success: true, message: "Edited setting." })
     } catch (error) {
         res.status(500).json({ success: false, message: `Sikertelen lekérés (ERR_SERVER: ${error})` })
+        sendMail("baloghtlevente@gmail.com", "API Error", `ERROR: ${error}`)
     }
 })
+
+app.post("/api/support/request/:station", async (req, res) => {
+    try {
+        const station = req.params.station;
+        const currentTime = date_fns.format(new Date(), 'PPpp'); // Proper date-fns usage
+
+        //console.log(`${currentDate} ${currentTime}`);
+
+        await sendMail(
+        SETTINGS["support-notification-email"],
+        "Riasztás!",
+        `Állomás: "${station}" segítséget kért. (${currentTime})`
+        );
+
+        io.emit("support", station)
+
+        await logs.createEntry({
+            userid: 0,
+            stationid: 0,
+            points: `Riasztás: ${station}`,
+            log: true,
+            goodLog: true
+        })
+
+        res.status(200).json({ success: true, message: "Support requested!" });
+    } catch (error) {
+        sendMail("baloghtlevente@gmail.com", "API Error", `ERROR: ${error}`)
+        res.status(500).json({ success: false, message: `Sikertelen segítség kérés (ERR_SERVER: ${error})` })
+        console.log(error)
+    }
+})
+
 
 /*/
 /*/
@@ -373,6 +474,7 @@ app.post("/api/settings/post/:name/:value", (req, res) => {
 //})
 
 
-app.listen(process.env.PORT || 3000, () => {
+server.listen(process.env.PORT || 3000, "192.168.1.24", async () => {
+    await startup()
     console.log(`Server is running on port ${process.env.PORT || 3000}`)
-})
+});
