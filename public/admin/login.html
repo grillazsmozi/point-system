@@ -220,11 +220,35 @@
         </button>
       </div>
     </div>
+<button id="loginbtn" style="
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+  width: 60px;
+  height: 60px;
+  background-color: #e53935;
+  border: none;
+  border-radius: 50%;
+  color: white;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  cursor: pointer;
+">
+  <i class="ri-phone-fill"></i>
+</button>
+
+<script src="/socket.io/socket.io.js"></script>
     <script>
       let code = "";
       const circles = document.querySelectorAll(".code-circle");
       const numpadBtns = document.querySelectorAll(".numpad-btn");
       let validCode = "";
+
+      
 
       fetch('/api/settings/get/admin-login-code')
       .then(response => response.text())
@@ -329,9 +353,24 @@
       }
     </script>
     <script>
+      const socket = io(); // Ensure Socket.IO client is connected
+
         if (window.sessionStorage.getItem("admin-logged") == "true") {
             window.location.href = "/admin/"; 
         }
+
+        document.getElementById("loginbtn").addEventListener("click", () => {
+        const name = prompt("Add meg a neved:");
+        if (!name) return;
+          socket.emit("loginRequest", { name });
+        });
+
+        socket.on("loginApproved", () => {
+          // You handle login here
+          window.sessionStorage.setItem("admin-logged", "true")
+          window.location.reload()
+          // window.location.href = “/dashboard”; // for example
+        });
     </script>
   </body>
 </html>

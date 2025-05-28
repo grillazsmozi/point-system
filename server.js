@@ -26,14 +26,39 @@ const server = http.createServer(app);
 
 const io = new Server(server);
 
-io.on('connection', (socket) => {
-  //console.log('Kapcsolódott:', socket.id);
+io.on("connection", (socket) => {
+  console.log("Client connected:", socket.id);
+
+  socket.on("loginRequest", ({ name }) => {
+    const id = socket.id;
+    const timestamp = Date.now();
+    pending[id] = socket;
+
+    // Notify all connected clients (can be filtered later)
+    io.emit("newLoginRequest", { name, id, timestamp });
+    console.log(`Login requested: ${name} (${id}) at ${new Date(timestamp).toISOString()}`);
+  });
+
+  socket.on("approveLogin", (id) => {
+    const targetSocket = pending[id];
+    if (targetSocket) {
+      targetSocket.emit("loginApproved");
+      delete pending[id];
+      console.log(`Login approved for ${id}`);
+    }
+  });
+
+  socket.on("disconnect", () => {
+    delete pending[socket.id];
+    console.log("Client disconnected:", socket.id);
+  });
 });
+
+const pending = {};
 
 let users = MS.getCollection("test_users")
 let logs = MS.getCollection("test_logs")
 let stations = MS.getCollection("test_stations")
-let settings = MS.getCollection("settings")
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json())
@@ -315,7 +340,7 @@ app.get("/api/stations/get/:id", async(req, res) => {
     }
 })
 
-app.get('/api/sounds/:name', (req, res) => {
+/*/app.get('/api/sounds/:name', (req, res) => {
     const soundName = req.params.name;
     const filePath = path.join(__dirname, 'public', 'sounds', soundName);
 
@@ -324,7 +349,7 @@ app.get('/api/sounds/:name', (req, res) => {
             res.status(404).json({ error: 'Sound not found' });
         }
     });
-});
+});/*/
 
 app.get("/api/users/get/:id", async(req, res) => {
     try {
@@ -430,6 +455,19 @@ app.post("/api/settings/post/:name/:value", (req, res) => {
         sendMail("baloghtlevente@gmail.com", "API Error", `ERROR: ${error}`)
     }
 })
+
+app.post("/api/admin/login/request/:name", async (req, res) => {
+    try {
+        const name = req.params.name
+
+        io.emit("admin-login-request", { name, token })
+    } catch (error) {
+        sendMail("baloghtlevente@gmail.com", "API Error", `ERROR: ${error}`)
+        res.status(500).json({ success: false, message: `Sikertelen segítség kérés (ERR_SERVER: ${error})` })
+        console.log(error)
+    }
+})
+
 
 app.post("/api/support/request/:station", async (req, res) => {
     try {

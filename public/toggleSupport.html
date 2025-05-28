@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorverseny | Segítség kérelem beállítása</title>
+</head>
+<body>
+    <p id="message">Kérelem lekérése</p>
+
+    <script>
+        const msg = document.getElementById("message")
+        const value = window.sessionStorage.getItem("supportRequests")
+
+        if (value) {
+            msg.innerText = "Beállítás FALSE-ra..."
+            window.sessionStorage.setItem("supportRequests", "false")
+            msg.innerText = "Kész!"
+            alert("Értesítések kikapcsolva!")
+            window.location.href = "/dashboard"
+        } else if (!value) {
+            msg.innerText = "Beállítás TRUE-ra..."
+            window.sessionStorage.setItem("supportRequests", "true")
+            msg.innerText = "Kész!"
+            alert("Értesítések bekapcsolva!")
+            window.location.href = "/dashboard"
+        }
+    </script>
+</body>
+</html>

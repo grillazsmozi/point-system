@@ -1,9 +1,10 @@
 const socket = io(); // Ensure Socket.IO client is connected
-  const errorSound = new Audio("/api/sounds/hands_on_steering_wheel.mp3")
+let errorSound = new Audio("/sounds/hands_on_steering_wheel.mp3")
 
-socket.on("support", (station) => {
+socket.on("support", async (station) => {
   // If already exists, don't recreate
   if (document.getElementById("support-request-overlay")) return;
+  if (window.sessionStorage.getItem("supportRequests") && window.sessionStorage.getItem("supportRequests") === "false") return;
 
   const overlay = document.createElement("div");
   overlay.id = "support-request-overlay";
@@ -25,5 +26,6 @@ socket.on("support", (station) => {
   document.body.appendChild(overlay);
 
 
-    errorSound.play()
+    await errorSound.play()
+    await errorSound.play()
 });
