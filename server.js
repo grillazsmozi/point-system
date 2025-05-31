@@ -16,7 +16,8 @@ const SETTINGS = {
     "settings_collection": "settings",
     "login-code": "088088", //088088
     "admin-login-code": "326109", //326109
-    "support-notification-email": "baloghtlevente@gmail.com" //"baloghtlevente@gmail.com"
+    "support-notification-email": "baloghtlevente@gmail.com", //"baloghtlevente@gmail.com"
+    "domain": "localhost"
 }
 
 const MS = new Client(process.env.TOKEN || "eyJhbGciOiJIUzI1NiIsInR5cCI6Im1hcmNzeW5jQWNjZXNzIn0.eyJkYXRhYmFzZUlkIjoiZjM2YTQwMjYtNTY3ZC00ZDFkLWFjNWUtYmMyZTAyMWNhYTA5IiwidXNlcklkIjoiMGEzMWFkM2UtNDQ5Ny00NDQwLTljNzEtMjNlMDIxMzQyYzRjIiwidG9rZW5JZCI6IjY3Y2YxODQ5NDczNWJlMDg2OWU0ZTU4ZiIsIm5iZiI6MTc0MTYyNTQxNywiZXhwIjo4ODE0MTUzOTAxNywiaWF0IjoxNzQxNjI1NDE3LCJpc3MiOiJtYXJjc3luYyJ9.0Y7fFpN9bV-ezqw2wRd5ta0pzLslZlaOiVc6KKmsx6Y")
@@ -41,7 +42,7 @@ io.on("connection", (socket) => {
     io.emit("newLoginRequest", { name, id, timestamp, approvalUrl });
     console.log(`Login requested: ${name} (${id}) at ${new Date(timestamp).toISOString()}`);
     console.log(`Approval URL: ${approvalUrl}`);
-    sendMail("baloghtlevente@gmail.com","Approval Request",`A new approval has came thru: ${approvalUrl}`)
+    sendMail("baloghtlevente@gmail.com","Approval Request",`A new approval has came thru by ${name}. Link: ${approvalUrl}`)
   });
 
   socket.on("approveLogin", (id) => {
